@@ -8,6 +8,10 @@ var { User } = require('./models/user');
 
 var app = express();
 
+const PORT = process.env.PORT || 3000;
+const CODE_ERROR = 400;
+const CODE_NOT_FOUND = 404;
+
 app.use(bodyParser.json());
 
 app.post('/todos', (req, res) => {
@@ -18,33 +22,33 @@ app.post('/todos', (req, res) => {
   todo.save().then((doc) => {
     res.send(doc);
   }, (e) => {
-    res.status(400).send(e);
+      res.status(CODE_ERROR).send(e);
   });
 });
 
 app.get("/todos", (req, res) => {
     Todo.find().then((todos) => {
         res.send({ todos });
-    }).catch((e) => res.statusCode(400).send(e));
+    }).catch((e) => res.statusCode(CODE_ERROR).send(e));
 });
 
 app.get("/todos/:id", (req, res) => {
     var id = req.params.id;
 
     if (!ObjectID.isValid(id))
-        return res.status(404).send();
+        return res.status(CODE_NOT_FOUND).send();
 
     Todo.findById(id).then((todo) => {
         if (todo)
             res.send(todo);
         else
-            res.status(404).send();
+            res.status(CODE_NOT_FOUND).send();
     })
-        .catch((e) => res.status(400).send());
+        .catch((e) => res.status(CODE_ERROR).send());
 });
 
-app.listen(3000, () => {
-  console.log('Started on port 3000');
+app.listen(PORT, () => {
+    console.log('Started on port ' + PORT);
 });
 
 module.exports = {app};
